@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>به خرید و فروش مجتمع روبیکا خوش آمدید</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, rgba(59, 130, 246, 0.1) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ستاره‌های شناور */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #fbbf24;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(var(--tx)) translateY(var(--ty));
+                opacity: 0.6;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #000;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 16px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #000;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(59, 130, 246, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        button:hover::before {
+            opacity: 1;
+        }
+
+        button:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-logout {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        /* مودال‌های مخفی */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease-in-out;
+            position: relative;
+            z-index: 101;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            margin-bottom: 30px;
+            color: #000;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(59, 130, 246, 0.05);
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .btn-cancel {
+            border-color: #999;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-cancel:active {
+            transform: scale(0.97);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+            text-align: center;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* پاپ‌آپ موفقیت */
+        .success-popup {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            z-index: 200;
+            border-right: 4px solid #10b981;
+            animation: slideInDown 0.4s ease-in-out;
+            display: none;
+        }
+
+        .success-popup.show {
+            display: block;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .success-popup.removing {
+            animation: slideOutUp 0.4s ease-in-out;
+        }
+
+        .success-popup p {
+            color: #000;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .success-popup strong {
+            display: block;
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+
+        /* موبایل */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 40px;
+            }
+
+            button {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ستاره‌های شناور -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- محتوای اصلی -->
+    <div class="container">
+        <h1>به خرید و فروش مجتمع روبیکا خوش آمدید</h1>
+        
+        <div class="buttons-container">
+            <button id="signupBtn">ثبت نام (جدید)</button>
+            <button id="loginBtn">ورود (با رمز عبور و نام کاربری)</button>
+            <button id="adminLoginBtn" class="btn-logout">ورود مدیران</button>
+        </div>
+    </div>
+
+    <!-- مودال ثبت‌نام -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <h2>ثبت نام</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupUsername">نام کاربری</label>
+                    <input 
+                        type="text" 
+                        id="signupUsername" 
+                        placeholder="حداقل 6 کاراکتر (فقط حروف انگلیسی و اعداد)"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">رمز عبور</label>
+                    <input 
+                        type="password" 
+                        id="signupPassword" 
+                        placeholder="حداقل 6 کاراکتر"
+                        required
+                    >
+                </div>
+                <div class="error-message" id="signupError"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-submit">ثبت نام</button>
+                    <button type="button" class="btn-cancel" onclick="closeSignupModal()">انصراف</button>
+                </div>
+            </form>
+        </div>
+                      </div>
+
+      <!-- مودال ورود -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2>ورود</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">نام کاربری</label>
+                    <input 
+                        type="text" 
+                        id="loginUsername" 
+                        placeholder="نام کاربری خود را وارد کنید"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">رمز عبور</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        placeholder="رمز عبور خود را وارد کنید"
+                        required
+                    >
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-submit">ورود</button>
+                    <button type="button" class="btn-cancel" onclick="closeLoginModal()">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال ورود مدیر -->
+    <div class="modal" id="adminLoginModal">
+        <div class="modal-content">
+            <h2>ورود مدیران</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminUsername">نام کاربری</label>
+                    <input 
+                        type="text" 
+                        id="adminUsername" 
+                        placeholder="نام کاربری مدیر"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">رمز عبور</label>
+                    <input 
+                        type="password" 
+                        id="adminPassword" 
+                        placeholder="رمز عبور مدیر"
+                        required
+                    >
+                </div>
+                <div class="error-message" id="adminLoginError"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-submit">ورود</button>
+                    <button type="button" class="btn-cancel" onclick="closeAdminLoginModal()">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- پاپ‌آپ موفقیت -->
+    <div class="success-popup" id="successPopup">
+        <strong>✓ موفقیت آمیز</strong>
+        <p id="successMessage"></p>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaBpj9yKDf8nZynrRYzB6cwrsNXLYNLLg",
+            authDomain: "mmdproj-1b37b.firebaseapp.com",
+            projectId: "mmdproj-1b37b",
+            storageBucket: "mmdproj-1b37b.firebasestorage.app",
+            messagingSenderId: "524684192299",
+            appId: "1:524684192299:web:2fe8d6c2724944f873986e"
+        };
+
+        // Firebase Init
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ستاره‌های شناور
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const tx = (Math.random() - 0.5) * 100;
+                const ty = (Math.random() - 0.5) * 100;
+                const duration = 8 + Math.random() * 12;
+                
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.setProperty('--tx', tx + 'px');
+                star.style.setProperty('--ty', ty + 'px');
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // مودال‌ها
+        function openSignupModal() {
+            document.getElementById('signupModal').classList.add('show');
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signupModal').classList.remove('show');
+            document.getElementById('signupError').classList.remove('show');
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        function openAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('show');
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.remove('show');
+            document.getElementById('adminLoginError').classList.remove('show');
+        }
+
+        // پاپ‌آپ موفقیت
+        function showSuccessPopup(message) {
+            const popup = document.getElementById('successPopup');
+            document.getElementById('successMessage').textContent = message;
+            popup.classList.add('show');
+            popup.classList.remove('removing');
+            
+            setTimeout(() => {
+                popup.classList.add('removing');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 400);
+            }, 3000);
+        }
+
+        // اسلش پیام خطا
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).classList.remove('show');
+        }
+
+        // اعتبار‌سنجی
+        function validateUsername(username) {
+            if (username.length < 6) {
+                return 'نام کاربری باید حداقل 6 کاراکتر باشد';
+            }
+            if (!/^[a-zA-Z0-9]*$/.test(username)) {
+                return 'نام کاربری فقط می‌تواند شامل حروف انگلیسی و اعداد باشد';
+            }
+            return null;
+        }
+
+        function validatePassword(password) {
+            if (password.length < 6) {
+                return 'رمز عبور باید حداقل 6 کاراکتر باشد';
+            }
+            return null;
+        }
+
+        // ثبت‌نام
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('signupError');
+
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+
+            const usernameError = validateUsername(username);
+            if (usernameError) {
+                showError('signupError', usernameError);
+                return;
+            }
+
+            const passwordError = validatePassword(password);
+            if (passwordError) {
+                showError('signupError', passwordError);
+                return;
+            }
+
+            try {
+                // چک کردن اگر نام کاربری قبلاً وجود دارد
+                const snapshot = await database.ref('users').child(username).get();
+                if (snapshot.exists()) {
+                    showError('signupError', 'این نام کاربری قبلاً ثبت شده است');
+                    return;
+                }
+
+                // ثبت کاربر جدید
+                await database.ref('users').child(username).set({
+                    password: password,
+                    createdAt: new Date().toISOString()
+                });
+
+                // ذخیره نام کاربری در localStorage
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', 'user');
+
+                closeSignupModal();
+                showSuccessPopup(`خوش آمدید ${username}!`);
+                
+                setTimeout(() => {
+                    window.location.href = 'asli.html';
+                }, 1500);
+            } catch (error) {
+                showError('signupError', 'خطایی در سرور رخ داده است');
+                console.error(error);
+            }
+        });
+
+        // ورود کاربر
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('loginError');
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const snapshot = await database.ref('users').child(username).get();
+                
+                if (!snapshot.exists()) {
+                    showError('loginError', 'این نام کاربری وجود ندارد');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                if (userData.password !== password) {
+                    showError('loginError', 'رمز عبور اشتباه است');
+                    return;
+                }
+
+                // ورود موفق
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', 'user');
+                
+                closeLoginModal();
+                showSuccessPopup('ورود موفقیت‌آمیز بود');
+                
+                setTimeout(() => {
+                    window.location.href = 'asli.html';
+                }, 1500);
+            } catch (error) {
+                showError('loginError', 'خطایی در سرور رخ داده است');
+                console.error(error);
+            }
+        });
+
+        // ورود مدیر
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('adminLoginError');
+
+            const username = document.getElementById('adminUsername').value.toLowerCase();
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const snapshot = await database.ref('admin').get();
+                
+                let adminData;
+                if (!snapshot.exists()) {
+                    // اگر مدیری وجود نداشت، مدیر پیش‌فرض رو ایجاد کن
+                    adminData = {
+                        username: 'fizon',
+                        password: '1234',
+                        phone: '',
+                        name: ''
+                    };
+                    await database.ref('admin').set(adminData);
+                } else {
+                    adminData = snapshot.val();
+                }
+
+                if (adminData.username.toLowerCase() !== username || adminData.password !== password) {
+                    showError('adminLoginError', 'نام کاربری یا رمز عبور اشتباه است');
+                    return;
+                }
+
+                // ورود مدیر موفق
+                localStorage.setItem('adminUsername', username);
+                localStorage.setItem('userType', 'admin');
+                
+                closeAdminLoginModal();
+                showSuccessPopup('ورود مدیریت موفقیت‌آمیز بود');
+                
+                setTimeout(() => {
+                    window.location.href = 'aslimodir.html';
+                }, 1500);
+            } catch (error) {
+                showError('adminLoginError', 'خطایی در سرور رخ داده است');
+                console.error(error);
+            }
+        });
+
+        // دکمه‌ها
+        document.getElementById('signupBtn').addEventListener('click', openSignupModal);
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+        document.getElementById('adminLoginBtn').addEventListener('click', openAdminLoginModal);
+
+        // بستن مودال با کلیک روی پس‌زمینه
+        document.getElementById('signupModal').addEventListener('click', (e) => {
+            if (e.target.id === 'signupModal') closeSignupModal();
+        });
+
+        document.getElementById('loginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') closeLoginModal();
+        });
+
+        document.getElementById('adminLoginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'adminLoginModal') closeAdminLoginModal();
+        });
+
+        // راه‌اندازی ستاره‌ها
+        createStars();
+    </script>
+</body>
+</html>
