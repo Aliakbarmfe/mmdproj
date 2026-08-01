@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه روبیکا</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, rgba(59, 130, 246, 0.1) 100%);
+            min-height: 100vh;
+            color: #000;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ستاره‌های شناور */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #fbbf24;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(var(--tx)) translateY(var(--ty));
+                opacity: 0.6;
+            }
+        }
+
+        header {
+            position: relative;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            animation: slideInDown 0.5s ease-in-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:active {
+            transform: scale(0.97);
+        }
+
+        .logout-btn {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .main {
+            position: relative;
+            z-index: 10;
+            padding: 30px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .products-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 100px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease-in-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .product-card:active {
+            transform: scale(0.98);
+        }
+
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .product-prices {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .offer-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        /* مودال‌ها */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease-in-out;
+            position: relative;
+            z-index: 101;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .close-modal:active {
+            transform: scale(0.9);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #000;
+            font-size: 1.8rem;
+        }
+
+        .product-detail-info {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .product-detail-info p {
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .product-detail-info strong {
+            display: inline-block;
+            min-width: 120px;
+            font-weight: 600;
+        }
+
+        .buy-btn, .confirm-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid #3b82f6;
+            color: #000;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-top: 15px;
+        }
+
+        .buy-btn:active, .confirm-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* چت */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: rgba(59, 130, 246, 0.2);
+            margin-right: 10px;
+            text-align: right;
+        }
+
+        .message.admin {
+            background: rgba(16, 185, 129, 0.2);
+            margin-left: 10px;
+            text-align: left;
+        }
+
+        .message.admin::before {
+            content: '✓ ';
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            background: rgba(59, 130, 246, 0.05);
+            color: #000;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .chat-input-group input::placeholder {
+            color: #999;
+        }
+
+              .chat-input-group button {
+            padding: 12px 20px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid #3b82f6;
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-group button:active {
+            transform: scale(0.97);
+        }
+
+        /* دایره تماس */
+        .floating-contact {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            z-index: 30;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .floating-contact:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-contact:active {
+            transform: scale(0.95);
+        }
+
+        /* تلفن پاپ‌آپ */
+        .phone-popup {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 40;
+            display: none;
+            animation: slideUp 0.3s ease-in-out;
+            border-right: 4px solid #3b82f6;
+        }
+
+        .phone-popup.show {
+            display: block;
+        }
+
+        .phone-popup p {
+            color: #000;
+            margin: 0;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .phone-popup strong {
+            color: #3b82f6;
+            font-size: 1.1rem;
+        }
+
+        /* موبایل */
+        @media (max-width: 768px) {
+            .products-list {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px;
+                max-height: 90vh;
+            }
+
+            .chat-container {
+                height: 400px;
+            }
+
+            .floating-contact {
+                width: 55px;
+                height: 55px;
+                font-size: 1.5rem;
+                bottom: 20px;
+                left: 20px;
+            }
+
+            .phone-popup {
+                bottom: 90px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ستاره‌های شناور -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- هدر -->
+    <header>
+        <button class="header-btn logout-btn" id="logoutBtn">خروج</button>
+        <button class="header-btn" id="supportBtn">ارتباط با پشتیبانی</button>
+    </header>
+
+    <!-- محتوای اصلی -->
+    <div class="main">
+        <div class="products-list" id="productsList"></div>
+    </div>
+
+    <!-- دایره تماس -->
+    <div class="floating-contact" id="contactCircle">☎️</div>
+    <div class="phone-popup" id="phonePopup">
+        <p>شماره تلفن مدیر:</p>
+        <strong id="adminPhone">-</strong>
+    </div>
+
+    <!-- مودال جزئیات محصول -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeProductModal()">×</button>
+            <h2 id="modalProductName"></h2>
+            <div class="product-detail-info" id="productDetails"></div>
+            <button class="buy-btn" onclick="openPaymentModal()">خرید</button>
+        </div>
+    </div>
+
+    <!-- مودال پرداخت -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closePaymentModal()">×</button>
+            <h2>اطلاعات پرداخت</h2>
+            <div class="product-detail-info">
+                <p><strong>شماره کارت:</strong> <span id="cardNumber">-</span></p>
+                <p><strong>نام کارت:</strong> <span id="cardName">-</span></p>
+                <p><strong>آیدی روبیکا:</strong> <span id="rubikaID">-</span></p>
+            </div>
+            <button class="confirm-btn" onclick="confirmPurchase()">تایید خرید</button>
+        </div>
+    </div>
+
+    <!-- مودال چت پشتیبانی -->
+    <div class="modal" id="chatModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeChatModal()">×</button>
+            <h2>ارتباط با پشتیبانی</h2>
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-group">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="پیام خود را بنویسید..."
+                    >
+                    <button onclick="sendMessage()">ارسال</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaBpj9yKDf8nZynrRYzB6cwrsNXLYNLLg",
+            authDomain: "mmdproj-1b37b.firebaseapp.com",
+            projectId: "mmdproj-1b37b",
+            storageBucket: "mmdproj-1b37b.firebasestorage.app",
+            messagingSenderId: "524684192299",
+            appId: "1:524684192299:web:2fe8d6c2724944f873986e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // متغیرهای عمومی
+        let currentUsername = '';
+        let currentProductId = '';
+        let currentProductData = {};
+
+        // بررسی ورود
+        window.addEventListener('load', () => {
+            const username = localStorage.getItem('username');
+            const userType = localStorage.getItem('userType');
+
+            if (!username || userType !== 'user') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUsername = username;
+            loadProducts();
+            loadAdminInfo();
+
+            // جلوگیری از برگشت
+            history.pushState(null, null, location.href);
+            window.addEventListener('popstate', () => {
+                history.pushState(null, null, location.href);
+            });
+
+            // جلوگیری از ریفرش
+            if (window.history.forward(1) === location.href) {
+                window.history.forward();
+            }
+        });
+
+        // ستاره‌های شناور
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const tx = (Math.random() - 0.5) * 100;
+                const ty = (Math.random() - 0.5) * 100;
+                const duration = 8 + Math.random() * 12;
+                
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.setProperty('--tx', tx + 'px');
+                star.style.setProperty('--ty', ty + 'px');
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // بارگذاری محصولات
+        async function loadProducts() {
+            try {
+                const snapshot = await database.ref('products').get();
+                const productsList = document.getElementById('productsList');
+                productsList.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const products = snapshot.val();
+                    Object.entries(products).forEach(([productId, product], index) => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.style.animationDelay = (index * 0.1) + 's';
+                        card.innerHTML = `
+                            <div class="product-name">${product.name || 'محصول بدون نام'}</div>
+                            <div class="product-prices">
+                                <span class="original-price">${product.originalPrice || 0} تومان</span>
+                                <span class="offer-price">${product.offerPrice || 0} تومان</span>
+                            </div>
+                        `;
+                        card.addEventListener('click', () => openProductModal(productId, product));
+                        productsList.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری محصولات:', error);
+            }
+        }
+
+        // باز کردن جزئیات محصول
+        function openProductModal(productId, product) {
+            currentProductId = productId;
+            currentProductData = product;
+
+            document.getElementById('modalProductName').textContent = product.name || 'محصول';
+            
+            const detailsHtml = `
+                <p><strong>نام پلتفرم:</strong> ${product.platform || '-'}</p>
+                <p><strong>تعداد ممبر/فالور:</strong> ${product.members || '-'}</p>
+                <p><strong>قیمت اصلی:</strong> ${product.originalPrice || 0} تومان</p>
+                <p><strong>قیمت آفر:</strong> ${product.offerPrice || 0} تومان</p>
+                <p><strong>توضیحات:</strong> ${product.description || '-'}</p>
+            `;
+            
+            document.getElementById('productDetails').innerHTML = detailsHtml;
+            document.getElementById('productModal').classList.add('show');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('show');
+        }
+
+        // باز کردن مودال پرداخت
+        function openPaymentModal() {
+            document.getElementById('cardNumber').textContent = currentProductData.cardNumber || '-';
+            document.getElementById('cardName').textContent = currentProductData.cardName || '-';
+            document.getElementById('rubikaID').textContent = currentProductData.rubikaID || '-';
+            
+            closeProductModal();
+            document.getElementById('paymentModal').classList.add('show');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('show');
+        }
+
+        // تایید خرید
+        async function confirmPurchase() {
+            try {
+                const purchaseData = {
+                    username: currentUsername,
+                    productName: currentProductData.name,
+                    productId: currentProductId,
+                    timestamp: new Date().toISOString(),
+                    price: currentProductData.offerPrice
+                };
+
+                await database.ref('purchases').push(purchaseData);
+                
+                closePaymentModal();
+                alert('خرید شما با موفقیت ثبت شد!');
+                
+                // بازگشت به صفحه
+                loadProducts();
+            } catch (error) {
+                console.error('خطا در ثبت خرید:', error);
+                alert('خطایی رخ داده است');
+            }
+        }
+
+        // بارگذاری اطلاعات مدیر
+        async function loadAdminInfo() {
+            try {
+                const snapshot = await database.ref('admin').get();
+                if (snapshot.exists()) {
+                    const adminData = snapshot.val();
+                    document.getElementById('adminPhone').textContent = adminData.phone || 'بدون شماره';
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری اطلاعات مدیر:', error);
+            }
+        }
+
+        // دایره تماس
+        document.getElementById('contactCircle').addEventListener('click', () => {
+            const popup = document.getElementById('phonePopup');
+            popup.classList.toggle('show');
+        });
+
+        // چت پشتیبانی
+        document.getElementById('supportBtn').addEventListener('click', () => {
+            document.getElementById('chatModal').classList.add('show');
+            loadMessages();
+        });
+
+        function closeChatModal() {
+            document.getElementById('chatModal').classList.remove('show');
+        }
+
+        // بارگذاری پیام‌های چت
+        async function loadMessages() {
+            try {
+                const chatKey = `chat_${currentUsername}`;
+                const snapshot = await database.ref('messages').child(chatKey).get();
+                const messagesDiv = document.getElementById('chatMessages');
+                messagesDiv.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    Object.values(messages).forEach((msg, index) => {
+                        const messageEl = document.createElement('div');
+                        messageEl.className = `message ${msg.sender}`;
+                        messageEl.textContent = msg.text;
+                        messagesDiv.appendChild(messageEl);
+                        
+                        // Scroll to bottom
+                        setTimeout(() => {
+                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        }, 100);
+                    });
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری پیام‌ها:', error);
+            }
+        }
+
+        // ارسال پیام
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            try {
+                const chatKey = `chat_${currentUsername}`;
+                await database.ref('messages').child(chatKey).push({
+                    sender: 'user',
+                    text: message,
+                    timestamp: new Date().toISOString()
+                });
+
+                input.value = '';
+                loadMessages();
+            } catch (error) {
+                console.error('خطا در ارسال پیام:', error);
+            }
+        }
+
+        // خروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            const fadeBody = document.createElement('div');
+            fadeBody.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                animation: fadeIn 0.4s ease-in-out;
+            `;
+            document.body.appendChild(fadeBody);
+
+            setTimeout(() => {
+                localStorage.removeItem('username');
+                localStorage.removeItem('userType');
+                window.location.href = 'index.html';
+            }, 400);
+        });
+
+        // Enter برای ارسال پیام
+        document.addEventListener('keypress', (e) => {
+            if (e.target.id === 'chatInput' && e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // بستن مودال‌ها با کلیک روی پس‌زمینه
+        document.getElementById('productModal').addEventListener('click', (e) => {
+            if (e.target.id === 'productModal') closeProductModal();
+        });
+
+        document.getElementById('paymentModal').addEventListener('click', (e) => {
+            if (e.target.id === 'paymentModal') closePaymentModal();
+        });
+
+        document.getElementById('chatModal').addEventListener('click', (e) => {
+            if (e.target.id === 'chatModal') closeChatModal();
+        });
+
+        // راه‌اندازی ستاره‌ها
+        createStars();
+    </script>
+</body>
+</html>
