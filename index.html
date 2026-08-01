@@ -307,7 +307,7 @@
         </div>
     </div>
 
-        <div class="modal" id="adminLoginModal">
+    <div class="modal" id="adminLoginModal">
         <div class="modal-content">
             <h2>ورود مدیران</h2>
             <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
@@ -338,14 +338,16 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
+        <!-- استفاده از کتابخانه‌های Compat جهت سازگاری با متد firebase.database() -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
 
     <script>
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDaBpj9yKDf8nZynrRYzB6cwrsNXLYNLLg",
             authDomain: "mmdproj-1b37b.firebaseapp.com",
+            databaseURL: "https://mmdproj-1b37b-default-rtdb.firebaseio.com",
             projectId: "mmdproj-1b37b",
             storageBucket: "mmdproj-1b37b.firebasestorage.app",
             messagingSenderId: "524684192299",
@@ -359,6 +361,8 @@
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
             console.log('✅ Firebase شروع شد');
+        } else {
+            database = firebase.database();
         }
 
         // مودال‌ها
@@ -420,7 +424,7 @@
             event.preventDefault();
             hideError('signupError');
 
-            const username = document.getElementById('signupUsername').value;
+            const username = document.getElementById('signupUsername').value.trim();
             const password = document.getElementById('signupPassword').value;
 
             console.log('🔄 در حال ثبت نام...', username);
@@ -438,13 +442,13 @@
             }
 
             try {
-                const snapshot = await database.ref('users').child(username).get();
+                const snapshot = await database.ref('users/' + username).once('value');
                 if (snapshot.exists()) {
                     showError('signupError', 'این نام کاربری قبلاً ثبت شده است');
                     return;
                 }
 
-                await database.ref('users').child(username).set({
+                await database.ref('users/' + username).set({
                     password: password,
                     createdAt: new Date().toISOString()
                 });
@@ -461,8 +465,8 @@
                     window.location.href = 'asli.html';
                 }, 500);
             } catch (error) {
-                console.error('❌ خطا:', error);
-                showError('signupError', 'خطایی در سرور رخ داده است');
+                console.error('❌ خطا در دیتابیس:', error);
+                showError('signupError', 'خطایی در اتصال به سرور رخ داده است: ' + error.message);
             }
         }
 
@@ -471,13 +475,13 @@
             event.preventDefault();
             hideError('loginError');
 
-            const username = document.getElementById('loginUsername').value;
+            const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
 
             console.log('🔄 در حال ورود...', username);
 
             try {
-                const snapshot = await database.ref('users').child(username).get();
+                const snapshot = await database.ref('users/' + username).once('value');
                 
                 if (!snapshot.exists()) {
                     showError('loginError', 'این نام کاربری وجود ندارد');
@@ -503,7 +507,7 @@
                 }, 500);
             } catch (error) {
                 console.error('❌ خطا:', error);
-                showError('loginError', 'خطایی در سرور رخ داده است');
+                showError('loginError', 'خطایی در سرور رخ داده است: ' + error.message);
             }
         }
 
@@ -512,13 +516,13 @@
             event.preventDefault();
             hideError('adminLoginError');
 
-            const username = document.getElementById('adminUsername').value.toLowerCase();
+            const username = document.getElementById('adminUsername').value.trim().toLowerCase();
             const password = document.getElementById('adminPassword').value;
 
             console.log('🔄 در حال ورود مدیر...', username);
 
             try {
-                const snapshot = await database.ref('admin').get();
+                const snapshot = await database.ref('admin').once('value');
                 
                 let adminData;
                 if (!snapshot.exists()) {
@@ -552,7 +556,7 @@
                 }, 500);
             } catch (error) {
                 console.error('❌ خطا:', error);
-                showError('adminLoginError', 'خطایی در سرور رخ داده است');
+                showError('adminLoginError', 'خطایی در سرور رخ داده است: ' + error.message);
             }
         }
 
