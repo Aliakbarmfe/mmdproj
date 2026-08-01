@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت فروشگاه</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, rgba(59, 130, 246, 0.1) 100%);
+            min-height: 100vh;
+            color: #000;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ستاره‌های شناور */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #fbbf24;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(var(--tx)) translateY(var(--ty));
+                opacity: 0.6;
+            }
+        }
+
+        header {
+            position: relative;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            gap: 10px;
+            animation: slideInDown 0.5s ease-in-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-left {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .header-center {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:active {
+            transform: scale(0.97);
+        }
+
+        .logout-btn {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .add-btn {
+            font-size: 1.5rem;
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main {
+            position: relative;
+            z-index: 10;
+            padding: 30px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-in-out;
+            padding-bottom: 150px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .products-table th {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .products-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .edit-btn, .delete-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        .delete-btn {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+
+        .edit-btn:active, .delete-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* مودال‌ها */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease-in-out;
+            position: relative;
+            margin: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .close-modal:active {
+            transform: scale(0.9);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 25px;
+            color: #000;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #000;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: rgba(59, 130, 246, 0.05);
+            color: #000;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: #999;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-buttons button:active {
+            transform: scale(0.97);
+        }
+
+              .btn-cancel {
+            border-color: #999;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* لیست کاربران */
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .user-item {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-right: 3px solid #3b82f6;
+        }
+
+        .user-item strong {
+            display: block;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+
+        .user-item span {
+            display: block;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* لیست پیام‌ها */
+        .messages-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-right: 3px solid #3b82f6;
+        }
+
+        .message-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .message-item:active {
+            transform: scale(0.98);
+        }
+
+        .message-item strong {
+            display: block;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .message-item small {
+            display: block;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        /* پایین صفحه دکمه‌ها */
+        .footer-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            z-index: 40;
+        }
+
+        .footer-btn {
+            padding: 12px 25px;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* موبایل */
+        @media (max-width: 768px) {
+            header {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header-left, .header-center, .header-right {
+                width: 100%;
+                justify-content: center !important;
+            }
+
+            .products-table {
+                font-size: 0.85rem;
+            }
+
+            .products-table th, .products-table td {
+                padding: 10px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .footer-buttons {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .footer-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ستاره‌های شناور -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- هدر -->
+    <header>
+        <div class="header-left">
+            <button class="header-btn logout-btn" id="logoutBtn">خروج از پنل مدیریت</button>
+        </div>
+        <div class="header-center">
+            <button class="header-btn" id="usersBtn">کاربران</button>
+        </div>
+        <div class="header-right">
+            <button class="header-btn add-btn" id="addProductBtn">+</button>
+        </div>
+    </header>
+
+    <!-- محتوای اصلی -->
+    <div class="main">
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>نام محصول</th>
+                    <th>قیمت آفر</th>
+                    <th>نام پلتفرم</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="productsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- پایین صفحه دکمه‌ها -->
+    <div class="footer-buttons">
+        <button class="footer-btn" id="messagesBtn">پیام کاربران</button>
+        <button class="footer-btn" id="adminInfoBtn">اطلاعات مدیر</button>
+    </div>
+
+    <!-- مودال اضافه/ویرایش محصول -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeProductModal()">×</button>
+            <h2 id="productModalTitle">اضافه کردن محصول جدید</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label>نام محصول</label>
+                    <input type="text" id="productName" placeholder="نام محصول" required>
+                </div>
+                <div class="form-group">
+                    <label>نام پلتفرم</label>
+                    <input type="text" id="productPlatform" placeholder="مثلا: اینستاگرام" required>
+                </div>
+                <div class="form-group">
+                    <label>تعداد ممبر/فالور</label>
+                    <input type="text" id="productMembers" placeholder="مثلا: 10,000">
+                </div>
+                <div class="form-group">
+                    <label>قیمت اصلی</label>
+                    <input type="number" id="productOriginalPrice" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>قیمت آفر</label>
+                    <input type="number" id="productOfferPrice" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>توضیحات اضافی</label>
+                    <textarea id="productDescription" placeholder="توضیحات محصول"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>شماره کارت</label>
+                    <input type="text" id="productCardNumber" placeholder="شماره کارت" required>
+                </div>
+                <div class="form-group">
+                    <label>نام صاحب کارت</label>
+                    <input type="text" id="productCardName" placeholder="نام صاحب کارت" required>
+                </div>
+                <div class="form-group">
+                    <label>آیدی روبیکا</label>
+                    <input type="text" id="productRubikaID" placeholder="آیدی روبیکا" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" id="submitBtn">ثبت</button>
+                    <button type="button" class="btn-cancel" onclick="closeProductModal()">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال کاربران -->
+    <div class="modal" id="usersModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeUsersModal()">×</button>
+            <h2>لیست کاربران ثبت‌شده</h2>
+            <div class="users-list" id="usersList"></div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn-cancel" onclick="closeUsersModal()" style="flex: 1;">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال پیام کاربران -->
+    <div class="modal" id="messagesModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeMessagesModal()">×</button>
+            <h2>پیام‌های کاربران</h2>
+            <div class="messages-list" id="messagesList"></div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn-cancel" onclick="closeMessagesModal()" style="flex: 1;">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال جواب به پیام -->
+    <div class="modal" id="replyModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeReplyModal()">×</button>
+            <h2 id="replyUsername">پیام از کاربر</h2>
+            <div id="conversationHistory" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 8px;"></div>
+            <div class="form-group">
+                <label>جواب شما</label>
+                <textarea id="replyText" placeholder="پیام خود را بنویسید..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="sendReply()" id="sendReplyBtn">ارسال</button>
+                <button type="button" class="btn-cancel" onclick="closeReplyModal()">انصراف</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال اطلاعات مدیر -->
+    <div class="modal" id="adminInfoModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeAdminInfoModal()">×</button>
+            <h2>اطلاعات مدیر</h2>
+            <form id="adminInfoForm">
+                <div class="form-group">
+                    <label>نام مدیر</label>
+                    <input type="text" id="adminName" placeholder="نام مدیر">
+                </div>
+                <div class="form-group">
+                    <label>شماره تلفن</label>
+                    <input type="tel" id="adminPhone" placeholder="شماره تلفن">
+                </div>
+                <div class="form-group">
+                    <label>نام کاربری جدید (اختیاری)</label>
+                    <input type="text" id="adminNewUsername" placeholder="برای تغییر نام کاربری">
+                </div>
+                <div class="form-group">
+                    <label>رمز عبور جدید (اختیاری)</label>
+                    <input type="password" id="adminNewPassword" placeholder="برای تغییر رمز عبور">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">ذخیره</button>
+                    <button type="button" class="btn-cancel" onclick="closeAdminInfoModal()">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaBpj9yKDf8nZynrRYzB6cwrsNXLYNLLg",
+            authDomain: "mmdproj-1b37b.firebaseapp.com",
+            projectId: "mmdproj-1b37b",
+            storageBucket: "mmdproj-1b37b.firebasestorage.app",
+            messagingSenderId: "524684192299",
+            appId: "1:524684192299:web:2fe8d6c2724944f873986e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // متغیرهای عمومی
+        let currentEditingProductId = null;
+        let currentReplyingUsername = null;
+
+              // بررسی ورود
+        window.addEventListener('load', () => {
+            const userType = localStorage.getItem('userType');
+
+            if (userType !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            loadProducts();
+            loadAdminInfo();
+            createStars();
+
+            // جلوگیری از برگشت
+            history.pushState(null, null, location.href);
+            window.addEventListener('popstate', () => {
+                history.pushState(null, null, location.href);
+            });
+
+            // جلوگیری از ریفرش
+            if (window.history.forward(1) === location.href) {
+                window.history.forward();
+            }
+        });
+
+        // ستاره‌های شناور
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const tx = (Math.random() - 0.5) * 100;
+                const ty = (Math.random() - 0.5) * 100;
+                const duration = 8 + Math.random() * 12;
+                
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.setProperty('--tx', tx + 'px');
+                star.style.setProperty('--ty', ty + 'px');
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // بارگذاری محصولات
+        async function loadProducts() {
+            try {
+                const snapshot = await database.ref('products').get();
+                const tableBody = document.getElementById('productsTableBody');
+                tableBody.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const products = snapshot.val();
+                    Object.entries(products).forEach(([productId, product]) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.name || '-'}</td>
+                            <td>${product.offerPrice || 0} تومان</td>
+                            <td>${product.platform || '-'}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="edit-btn" onclick="editProduct('${productId}')">✏️</button>
+                                    <button class="delete-btn" onclick="deleteProduct('${productId}')">🗑️</button>
+                                </div>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری محصولات:', error);
+            }
+        }
+
+        // باز کردن مودال اضافه کردن محصول
+        document.getElementById('addProductBtn').addEventListener('click', () => {
+            currentEditingProductId = null;
+            document.getElementById('productModalTitle').textContent = 'اضافه کردن محصول جدید';
+            document.getElementById('submitBtn').textContent = 'ثبت';
+            document.getElementById('productForm').reset();
+            document.getElementById('productModal').classList.add('show');
+        });
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('show');
+        }
+
+        // ویرایش محصول
+        async function editProduct(productId) {
+            try {
+                const snapshot = await database.ref('products').child(productId).get();
+                if (snapshot.exists()) {
+                    const product = snapshot.val();
+                    currentEditingProductId = productId;
+
+                    document.getElementById('productModalTitle').textContent = 'ویرایش محصول';
+                    document.getElementById('submitBtn').textContent = 'ذخیره';
+                    
+                    document.getElementById('productName').value = product.name || '';
+                    document.getElementById('productPlatform').value = product.platform || '';
+                    document.getElementById('productMembers').value = product.members || '';
+                    document.getElementById('productOriginalPrice').value = product.originalPrice || '';
+                    document.getElementById('productOfferPrice').value = product.offerPrice || '';
+                    document.getElementById('productDescription').value = product.description || '';
+                    document.getElementById('productCardNumber').value = product.cardNumber || '';
+                    document.getElementById('productCardName').value = product.cardName || '';
+                    document.getElementById('productRubikaID').value = product.rubikaID || '';
+
+                    document.getElementById('productModal').classList.add('show');
+                }
+            } catch (error) {
+                console.error('خطا در بارگذاری محصول:', error);
+            }
+        }
+
+        // حذف محصول
+        async function deleteProduct(productId) {
+            if (confirm('آیا مطمئن هستید؟')) {
+                try {
+                    await database.ref('products').child(productId).remove();
+                    loadProducts();
+                } catch (error) {
+                    console.error('خطا در حذف محصول:', error);
+                    alert('خطایی رخ داده است');
+                }
+            }
+        }
+
+        // ثبت محصول
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productData = {
+                name: document.getElementById('productName').value,
+                platform: document.getElementById('productPlatform').value,
+                members: document.getElementById('productMembers').value,
+                originalPrice: Number(document.getElementById('productOriginalPrice').value),
+                offerPrice: Number(document.getElementById('productOfferPrice').value),
+                description: document.getElementById('productDescription').value,
+                cardNumber: document.getElementById('productCardNumber').value,
+                cardName: document.getElementById('productCardName').value,
+                rubikaID: document.getElementById('productRubikaID').value
+            };
+
+            try {
+                if (currentEditingProductId) {
+                    await database.ref('products').child(currentEditingProductId).update(productData);
+                } else {
+                    await database.ref('products').push(productData);
+                }
+
+                closeProductModal();
+                loadProducts();
+            } catch (error) {
+                console.error('خطا:', error);
+                alert('خطایی رخ داده است');
+            }
+        });
+
+        // کاربران
+        document.getElementById('usersBtn').addEventListener('click', async () => {
+            try {
+                const snapshot = await database.ref('users').get();
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    Object.entries(users).forEach(([username, userData]) => {
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.innerHTML = `
+                            <strong>${username}</strong>
+                            <span>رمز عبور: ${userData.password}</span>
+                        `;
+                        usersList.appendChild(userItem);
+                    });
+                } else {
+                    usersList.innerHTML = '<p style="text-align: center; color: #999;">هیچ کاربری ثبت‌نام نشده است</p>';
+                }
+
+                document.getElementById('usersModal').classList.add('show');
+            } catch (error) {
+                console.error('خطا:', error);
+            }
+        });
+
+        function closeUsersModal() {
+            document.getElementById('usersModal').classList.remove('show');
+        }
+
+        // پیام کاربران
+        document.getElementById('messagesBtn').addEventListener('click', async () => {
+            try {
+                const snapshot = await database.ref('messages').get();
+                const messagesList = document.getElementById('messagesList');
+                messagesList.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    Object.entries(messages).forEach(([chatKey, chatMessages]) => {
+                        const username = chatKey.replace('chat_', '');
+                        const lastMessage = Object.values(chatMessages).pop();
+
+                        const messageItem = document.createElement('div');
+                        messageItem.className = 'message-item';
+                        messageItem.innerHTML = `
+                            <strong>${username}</strong>
+                            <small>${lastMessage.text.substring(0, 50)}...</small>
+                        `;
+                        messageItem.addEventListener('click', () => openReplyModal(username));
+                        messagesList.appendChild(messageItem);
+                    });
+                } else {
+                    messagesList.innerHTML = '<p style="text-align: center; color: #999;">هیچ پیامی نیست</p>';
+                }
+
+                document.getElementById('messagesModal').classList.add('show');
+            } catch (error) {
+                console.error('خطا:', error);
+            }
+        });
+
+        function closeMessagesModal() {
+            document.getElementById('messagesModal').classList.remove('show');
+        }
+
+        // باز کردن مودال جواب
+        async function openReplyModal(username) {
+            currentReplyingUsername = username;
+            document.getElementById('replyUsername').textContent = `پیام از: ${username}`;
+            document.getElementById('replyText').value = '';
+
+            try {
+                const snapshot = await database.ref('messages').child(`chat_${username}`).get();
+                const historyDiv = document.getElementById('conversationHistory');
+                historyDiv.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    Object.values(messages).forEach((msg) => {
+                        const msgEl = document.createElement('div');
+                        msgEl.style.cssText = `
+                            padding: 8px;
+                            margin-bottom: 8px;
+                            border-radius: 6px;
+                            text-align: ${msg.sender === 'user' ? 'right' : 'left'};
+                            background: ${msg.sender === 'user' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'};
+                        `;
+                        msgEl.textContent = msg.text;
+                        historyDiv.appendChild(msgEl);
+                    });
+                }
+
+                closeMessagesModal();
+                document.getElementById('replyModal').classList.add('show');
+            } catch (error) {
+                console.error('خطا:', error);
+            }
+        }
+
+        function closeReplyModal() {
+            document.getElementById('replyModal').classList.remove('show');
+        }
+
+        // ارسال جواب
+        async function sendReply() {
+            const replyText = document.getElementById('replyText').value.trim();
+            if (!replyText) return;
+
+            try {
+                await database.ref('messages').child(`chat_${currentReplyingUsername}`).push({
+                    sender: 'admin',
+                    text: replyText,
+                    timestamp: new Date().toISOString()
+                });
+
+                closeReplyModal();
+            } catch (error) {
+                console.error('خطا:', error);
+                alert('خطایی رخ داده است');
+            }
+        }
+
+        // بارگذاری اطلاعات مدیر
+        async function loadAdminInfo() {
+            try {
+                const snapshot = await database.ref('admin').get();
+                if (snapshot.exists()) {
+                    const adminData = snapshot.val();
+                    document.getElementById('adminName').value = adminData.name || '';
+                    document.getElementById('adminPhone').value = adminData.phone || '';
+                }
+            } catch (error) {
+                console.error('خطا:', error);
+            }
+        }
+
+        // اطلاعات مدیر
+        document.getElementById('adminInfoBtn').addEventListener('click', () => {
+            document.getElementById('adminInfoModal').classList.add('show');
+        });
+
+        function closeAdminInfoModal() {
+            document.getElementById('adminInfoModal').classList.remove('show');
+        }
+
+        // ذخیره اطلاعات مدیر
+        document.getElementById('adminInfoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const adminData = {
+                name: document.getElementById('adminName').value,
+                phone: document.getElementById('adminPhone').value
+            };
+
+            const newUsername = document.getElementById('adminNewUsername').value;
+            const newPassword = document.getElementById('adminNewPassword').value;
+
+            if (newUsername) {
+                adminData.username = newUsername;
+            }
+            if (newPassword) {
+                adminData.password = newPassword;
+            }
+
+            try {
+                await database.ref('admin').update(adminData);
+                closeAdminInfoModal();
+                alert('اطلاعات با موفقیت ذخیره شد');
+            } catch (error) {
+                console.error('خطا:', error);
+                alert('خطایی رخ داده است');
+            }
+        });
+
+        // خروج
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            const fadeBody = document.createElement('div');
+            fadeBody.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                animation: fadeIn 0.4s ease-in-out;
+            `;
+            document.body.appendChild(fadeBody);
+
+            setTimeout(() => {
+                localStorage.removeItem('adminUsername');
+                localStorage.removeItem('userType');
+                window.location.href = 'index.html';
+            }, 400);
+        });
+
+        // بستن مودال‌ها با کلیک روی پس‌زمینه
+        ['productModal', 'usersModal', 'messagesModal', 'replyModal', 'adminInfoModal'].forEach(id => {
+            document.getElementById(id).addEventListener('click', (e) => {
+                if (e.target.id === id) {
+                    document.getElementById(id).classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
