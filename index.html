@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* ستاره‌های شناور */
         .stars {
             position: fixed;
             top: 0;
@@ -45,17 +44,9 @@
         }
 
         @keyframes float {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 0.6;
-            }
-            50% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateX(var(--tx)) translateY(var(--ty));
-                opacity: 0.6;
-            }
+            0% { transform: translateX(0) translateY(0); opacity: 0.6; }
+            50% { opacity: 0.8; }
+            100% { transform: translateX(var(--tx)) translateY(var(--ty)); opacity: 0.6; }
         }
 
         .container {
@@ -66,14 +57,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -104,25 +89,10 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
-            position: relative;
-            overflow: hidden;
         }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(59, 130, 246, 0.1);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        button:hover::before {
-            opacity: 1;
+        button:hover {
+            background: rgba(59, 130, 246, 0.25);
         }
 
         button:active {
@@ -135,7 +105,6 @@
             background: rgba(59, 130, 246, 0.3);
         }
 
-        /* مودال‌های مخفی */
         .modal {
             display: none;
             position: fixed;
@@ -167,14 +136,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-content h2 {
@@ -233,10 +196,6 @@
             background: rgba(0, 0, 0, 0.05);
         }
 
-        .btn-cancel:active {
-            transform: scale(0.97);
-        }
-
         .error-message {
             color: #dc2626;
             font-size: 0.9rem;
@@ -256,64 +215,6 @@
             75% { transform: translateX(5px); }
         }
 
-        /* پاپ‌آپ موفقیت */
-        .success-popup {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-            z-index: 200;
-            border-right: 4px solid #10b981;
-            animation: slideInDown 0.4s ease-in-out;
-            display: none;
-        }
-
-        .success-popup.show {
-            display: block;
-        }
-
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideOutUp {
-            from {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-        }
-
-        .success-popup.removing {
-            animation: slideOutUp 0.4s ease-in-out;
-        }
-
-        .success-popup p {
-            color: #000;
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        .success-popup strong {
-            display: block;
-            color: #10b981;
-            margin-bottom: 8px;
-        }
-
-        /* موبایل */
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -332,25 +233,22 @@
     </style>
 </head>
 <body>
-    <!-- ستاره‌های شناور -->
     <div class="stars" id="starsContainer"></div>
 
-    <!-- محتوای اصلی -->
     <div class="container">
         <h1>به خرید و فروش مجتمع روبیکا خوش آمدید</h1>
         
         <div class="buttons-container">
-            <button id="signupBtn">ثبت نام (جدید)</button>
-            <button id="loginBtn">ورود (با رمز عبور و نام کاربری)</button>
-            <button id="adminLoginBtn" class="btn-logout">ورود مدیران</button>
+            <button onclick="openSignupModal()">ثبت نام (جدید)</button>
+            <button onclick="openLoginModal()">ورود (با رمز عبور و نام کاربری)</button>
+            <button onclick="openAdminLoginModal()" class="btn-logout">ورود مدیران</button>
         </div>
     </div>
 
-    <!-- مودال ثبت‌نام -->
     <div class="modal" id="signupModal">
         <div class="modal-content">
             <h2>ثبت نام</h2>
-            <form id="signupForm">
+            <form id="signupForm" onsubmit="handleSignup(event)">
                 <div class="form-group">
                     <label for="signupUsername">نام کاربری</label>
                     <input 
@@ -371,18 +269,17 @@
                 </div>
                 <div class="error-message" id="signupError"></div>
                 <div class="modal-buttons">
-                    <button type="submit" class="btn-submit">ثبت نام</button>
+                    <button type="submit">ثبت نام</button>
                     <button type="button" class="btn-cancel" onclick="closeSignupModal()">انصراف</button>
                 </div>
             </form>
         </div>
-                      </div>
+    </div>
 
-      <!-- مودال ورود -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <h2>ورود</h2>
-            <form id="loginForm">
+            <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="loginUsername">نام کاربری</label>
                     <input 
@@ -403,18 +300,17 @@
                 </div>
                 <div class="error-message" id="loginError"></div>
                 <div class="modal-buttons">
-                    <button type="submit" class="btn-submit">ورود</button>
+                    <button type="submit">ورود</button>
                     <button type="button" class="btn-cancel" onclick="closeLoginModal()">انصراف</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- مودال ورود مدیر -->
-    <div class="modal" id="adminLoginModal">
+        <div class="modal" id="adminLoginModal">
         <div class="modal-content">
             <h2>ورود مدیران</h2>
-            <form id="adminLoginForm">
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
                 <div class="form-group">
                     <label for="adminUsername">نام کاربری</label>
                     <input 
@@ -435,20 +331,13 @@
                 </div>
                 <div class="error-message" id="adminLoginError"></div>
                 <div class="modal-buttons">
-                    <button type="submit" class="btn-submit">ورود</button>
+                    <button type="submit">ورود</button>
                     <button type="button" class="btn-cancel" onclick="closeAdminLoginModal()">انصراف</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- پاپ‌آپ موفقیت -->
-    <div class="success-popup" id="successPopup">
-        <strong>✓ موفقیت آمیز</strong>
-        <p id="successMessage"></p>
-    </div>
-
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
 
@@ -463,13 +352,226 @@
             appId: "1:524684192299:web:2fe8d6c2724944f873986e"
         };
 
-        // Firebase Init
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        let database = null;
 
-        // ستاره‌های شناور
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log('✅ Firebase شروع شد');
+        }
+
+        // مودال‌ها
+        function openSignupModal() {
+            document.getElementById('signupModal').classList.add('show');
+            console.log('✅ مودال ثبت نام باز شد');
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signupModal').classList.remove('show');
+            document.getElementById('signupError').classList.remove('show');
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            console.log('✅ مودال ورود باز شد');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        function openAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('show');
+            console.log('✅ مودال ورود مدیر باز شد');
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.remove('show');
+            document.getElementById('adminLoginError').classList.remove('show');
+        }
+
+        // خطا
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.add('show');
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).classList.remove('show');
+        }
+
+        // اعتبار‌سنجی
+        function validateUsername(username) {
+            if (username.length < 6) return 'نام کاربری باید حداقل 6 کاراکتر باشد';
+            if (!/^[a-zA-Z0-9]*$/.test(username)) return 'نام کاربری فقط می‌تواند شامل حروف انگلیسی و اعداد باشد';
+            return null;
+        }
+
+        function validatePassword(password) {
+            if (password.length < 6) return 'رمز عبور باید حداقل 6 کاراکتر باشد';
+            return null;
+        }
+
+        // ثبت نام
+        async function handleSignup(event) {
+            event.preventDefault();
+            hideError('signupError');
+
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+
+            console.log('🔄 در حال ثبت نام...', username);
+
+            const usernameError = validateUsername(username);
+            if (usernameError) {
+                showError('signupError', usernameError);
+                return;
+            }
+
+            const passwordError = validatePassword(password);
+            if (passwordError) {
+                showError('signupError', passwordError);
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users').child(username).get();
+                if (snapshot.exists()) {
+                    showError('signupError', 'این نام کاربری قبلاً ثبت شده است');
+                    return;
+                }
+
+                await database.ref('users').child(username).set({
+                    password: password,
+                    createdAt: new Date().toISOString()
+                });
+
+                console.log('✅ ثبت نام موفق:', username);
+
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', 'user');
+
+                closeSignupModal();
+                alert(`خوش آمدید ${username}!`);
+                
+                setTimeout(() => {
+                    window.location.href = 'asli.html';
+                }, 500);
+            } catch (error) {
+                console.error('❌ خطا:', error);
+                showError('signupError', 'خطایی در سرور رخ داده است');
+            }
+        }
+
+        // ورود کاربر
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideError('loginError');
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            console.log('🔄 در حال ورود...', username);
+
+            try {
+                const snapshot = await database.ref('users').child(username).get();
+                
+                if (!snapshot.exists()) {
+                    showError('loginError', 'این نام کاربری وجود ندارد');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                if (userData.password !== password) {
+                    showError('loginError', 'رمز عبور اشتباه است');
+                    return;
+                }
+
+                console.log('✅ ورود موفق:', username);
+
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', 'user');
+                
+                closeLoginModal();
+                alert('ورود موفقیت‌آمیز بود');
+                
+                setTimeout(() => {
+                    window.location.href = 'asli.html';
+                }, 500);
+            } catch (error) {
+                console.error('❌ خطا:', error);
+                showError('loginError', 'خطایی در سرور رخ داده است');
+            }
+        }
+
+        // ورود مدیر
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            hideError('adminLoginError');
+
+            const username = document.getElementById('adminUsername').value.toLowerCase();
+            const password = document.getElementById('adminPassword').value;
+
+            console.log('🔄 در حال ورود مدیر...', username);
+
+            try {
+                const snapshot = await database.ref('admin').get();
+                
+                let adminData;
+                if (!snapshot.exists()) {
+                    adminData = {
+                        username: 'fizon',
+                        password: '1234',
+                        phone: '',
+                        name: ''
+                    };
+                    await database.ref('admin').set(adminData);
+                    console.log('✅ مدیر پیش‌فرض ایجاد شد');
+                } else {
+                    adminData = snapshot.val();
+                }
+
+                if (adminData.username.toLowerCase() !== username || adminData.password !== password) {
+                    showError('adminLoginError', 'نام کاربری یا رمز عبور اشتباه است');
+                    return;
+                }
+
+                console.log('✅ ورود مدیر موفق:', username);
+
+                localStorage.setItem('adminUsername', username);
+                localStorage.setItem('userType', 'admin');
+                
+                closeAdminLoginModal();
+                alert('ورود مدیریت موفقیت‌آمیز بود');
+                
+                setTimeout(() => {
+                    window.location.href = 'aslimodir.html';
+                }, 500);
+            } catch (error) {
+                console.error('❌ خطا:', error);
+                showError('adminLoginError', 'خطایی در سرور رخ داده است');
+            }
+        }
+
+        // بستن مودال با پس‌زمینه
+        document.getElementById('signupModal').addEventListener('click', (e) => {
+            if (e.target.id === 'signupModal') closeSignupModal();
+        });
+
+        document.getElementById('loginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') closeLoginModal();
+        });
+
+        document.getElementById('adminLoginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'adminLoginModal') closeAdminLoginModal();
+        });
+
+        // ستاره‌ها
         function createStars() {
-            const starsContainer = document.getElementById('starsContainer');
+            const container = document.getElementById('starsContainer');
             for (let i = 0; i < 30; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -486,236 +588,12 @@
                 star.style.animationDuration = duration + 's';
                 star.style.animationDelay = Math.random() * 2 + 's';
                 
-                starsContainer.appendChild(star);
+                container.appendChild(star);
             }
         }
 
-        // مودال‌ها
-        function openSignupModal() {
-            document.getElementById('signupModal').classList.add('show');
-        }
-
-        function closeSignupModal() {
-            document.getElementById('signupModal').classList.remove('show');
-            document.getElementById('signupError').classList.remove('show');
-        }
-
-        function openLoginModal() {
-            document.getElementById('loginModal').classList.add('show');
-        }
-
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.remove('show');
-            document.getElementById('loginError').classList.remove('show');
-        }
-
-        function openAdminLoginModal() {
-            document.getElementById('adminLoginModal').classList.add('show');
-        }
-
-        function closeAdminLoginModal() {
-            document.getElementById('adminLoginModal').classList.remove('show');
-            document.getElementById('adminLoginError').classList.remove('show');
-        }
-
-        // پاپ‌آپ موفقیت
-        function showSuccessPopup(message) {
-            const popup = document.getElementById('successPopup');
-            document.getElementById('successMessage').textContent = message;
-            popup.classList.add('show');
-            popup.classList.remove('removing');
-            
-            setTimeout(() => {
-                popup.classList.add('removing');
-                setTimeout(() => {
-                    popup.classList.remove('show');
-                }, 400);
-            }, 3000);
-        }
-
-        // اسلش پیام خطا
-        function showError(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = message;
-            errorElement.classList.add('show');
-        }
-
-        function hideError(elementId) {
-            document.getElementById(elementId).classList.remove('show');
-        }
-
-        // اعتبار‌سنجی
-        function validateUsername(username) {
-            if (username.length < 6) {
-                return 'نام کاربری باید حداقل 6 کاراکتر باشد';
-            }
-            if (!/^[a-zA-Z0-9]*$/.test(username)) {
-                return 'نام کاربری فقط می‌تواند شامل حروف انگلیسی و اعداد باشد';
-            }
-            return null;
-        }
-
-        function validatePassword(password) {
-            if (password.length < 6) {
-                return 'رمز عبور باید حداقل 6 کاراکتر باشد';
-            }
-            return null;
-        }
-
-        // ثبت‌نام
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError('signupError');
-
-            const username = document.getElementById('signupUsername').value;
-            const password = document.getElementById('signupPassword').value;
-
-            const usernameError = validateUsername(username);
-            if (usernameError) {
-                showError('signupError', usernameError);
-                return;
-            }
-
-            const passwordError = validatePassword(password);
-            if (passwordError) {
-                showError('signupError', passwordError);
-                return;
-            }
-
-            try {
-                // چک کردن اگر نام کاربری قبلاً وجود دارد
-                const snapshot = await database.ref('users').child(username).get();
-                if (snapshot.exists()) {
-                    showError('signupError', 'این نام کاربری قبلاً ثبت شده است');
-                    return;
-                }
-
-                // ثبت کاربر جدید
-                await database.ref('users').child(username).set({
-                    password: password,
-                    createdAt: new Date().toISOString()
-                });
-
-                // ذخیره نام کاربری در localStorage
-                localStorage.setItem('username', username);
-                localStorage.setItem('userType', 'user');
-
-                closeSignupModal();
-                showSuccessPopup(`خوش آمدید ${username}!`);
-                
-                setTimeout(() => {
-                    window.location.href = 'asli.html';
-                }, 1500);
-            } catch (error) {
-                showError('signupError', 'خطایی در سرور رخ داده است');
-                console.error(error);
-            }
-        });
-
-        // ورود کاربر
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError('loginError');
-
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const snapshot = await database.ref('users').child(username).get();
-                
-                if (!snapshot.exists()) {
-                    showError('loginError', 'این نام کاربری وجود ندارد');
-                    return;
-                }
-
-                const userData = snapshot.val();
-                if (userData.password !== password) {
-                    showError('loginError', 'رمز عبور اشتباه است');
-                    return;
-                }
-
-                // ورود موفق
-                localStorage.setItem('username', username);
-                localStorage.setItem('userType', 'user');
-                
-                closeLoginModal();
-                showSuccessPopup('ورود موفقیت‌آمیز بود');
-                
-                setTimeout(() => {
-                    window.location.href = 'asli.html';
-                }, 1500);
-            } catch (error) {
-                showError('loginError', 'خطایی در سرور رخ داده است');
-                console.error(error);
-            }
-        });
-
-        // ورود مدیر
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError('adminLoginError');
-
-            const username = document.getElementById('adminUsername').value.toLowerCase();
-            const password = document.getElementById('adminPassword').value;
-
-            try {
-                const snapshot = await database.ref('admin').get();
-                
-                let adminData;
-                if (!snapshot.exists()) {
-                    // اگر مدیری وجود نداشت، مدیر پیش‌فرض رو ایجاد کن
-                    adminData = {
-                        username: 'fizon',
-                        password: '1234',
-                        phone: '',
-                        name: ''
-                    };
-                    await database.ref('admin').set(adminData);
-                } else {
-                    adminData = snapshot.val();
-                }
-
-                if (adminData.username.toLowerCase() !== username || adminData.password !== password) {
-                    showError('adminLoginError', 'نام کاربری یا رمز عبور اشتباه است');
-                    return;
-                }
-
-                // ورود مدیر موفق
-                localStorage.setItem('adminUsername', username);
-                localStorage.setItem('userType', 'admin');
-                
-                closeAdminLoginModal();
-                showSuccessPopup('ورود مدیریت موفقیت‌آمیز بود');
-                
-                setTimeout(() => {
-                    window.location.href = 'aslimodir.html';
-                }, 1500);
-            } catch (error) {
-                showError('adminLoginError', 'خطایی در سرور رخ داده است');
-                console.error(error);
-            }
-        });
-
-        // دکمه‌ها
-        document.getElementById('signupBtn').addEventListener('click', openSignupModal);
-        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
-        document.getElementById('adminLoginBtn').addEventListener('click', openAdminLoginModal);
-
-        // بستن مودال با کلیک روی پس‌زمینه
-        document.getElementById('signupModal').addEventListener('click', (e) => {
-            if (e.target.id === 'signupModal') closeSignupModal();
-        });
-
-        document.getElementById('loginModal').addEventListener('click', (e) => {
-            if (e.target.id === 'loginModal') closeLoginModal();
-        });
-
-        document.getElementById('adminLoginModal').addEventListener('click', (e) => {
-            if (e.target.id === 'adminLoginModal') closeAdminLoginModal();
-        });
-
-        // راه‌اندازی ستاره‌ها
         createStars();
+        console.log('✅ صفحه کاملاً بارگذاری شد');
     </script>
 </body>
 </html>
